@@ -2,9 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
-import { Box, BookOpen, ArrowRight, ArrowLeft, Check, Circle, CircleMinus, CircuitBoard, Cpu, Eye, EyeOff, Fan, Focus, Hammer, HardDrive, Layers, Maximize, MemoryStick, Monitor, MousePointer2, Move, PanelLeft, Power, RotateCcw, Search, Sparkles, X, CircleHelp } from 'lucide-react';
+import { Box, BookOpen, ArrowRight, ArrowLeft, Check, CircleMinus, CircuitBoard, Cpu, Eye, EyeOff, Fan, Focus, Hammer, HardDrive, Layers, Maximize, MemoryStick, Monitor, MousePointer2, PanelLeft, Power, RotateCcw, Sparkles, X } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
-import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { COMPONENTS, PART_IDS, REMOVAL_ORDER, removeWithDependencies, reinstallWithDependencies, type PartId } from '@/lib/components-data';
 import PCViewport, { type ViewportHandle } from './pc-viewport';
 import { makeLabTools, registerLabTools } from '@/lib/webmcp';
@@ -21,7 +20,6 @@ const nameOf = (id: PartId) => COMPONENTS.find((part) => part.id === id)!.name;
 
 export default function HardwareLab({ onModeChange }: { onModeChange: (mode: Mode) => void }) {
   const [selected, setSelected] = useState<PartId | null>(null);
-  const [visited, setVisited] = useState<PartId[]>([]);
   const [removed, setRemoved] = useState<PartId[]>([]);
   const [hidden, setHidden] = useState<PartId[]>([]);
   const [explode, setExplode] = useState(0);
@@ -29,8 +27,6 @@ export default function HardwareLab({ onModeChange }: { onModeChange: (mode: Mod
   const [autoRotate, setAutoRotate] = useState(false);
   const [isolate, setIsolate] = useState(false);
   const [guided, setGuided] = useState(false);
-  const [query, setQuery] = useState('');
-  const [guideOpen, setGuideOpen] = useState(false);
   const [focusMode, setFocusMode] = useState(false);
   const [toast, setToast] = useState('');
   const [view, setView] = useState('perspective');
@@ -44,7 +40,6 @@ export default function HardwareLab({ onModeChange }: { onModeChange: (mode: Mod
   const select = useCallback((id: PartId | null) => {
     setSelected(id);
     if (id) {
-      setVisited((old) => old.includes(id) ? old : [...old, id]);
       setHidden((old) => old.filter((part) => part !== id));
     } else setIsolate(false);
   }, []);
@@ -97,34 +92,31 @@ export default function HardwareLab({ onModeChange }: { onModeChange: (mode: Mod
 
   return (
     <div className={`lab-app lab-app--workbench ${focusMode ? 'focus-mode' : ''}`}>
-      <AppHeader mode="explore" onModeChange={onModeChange} actions={<button className="quiet-button guide-button" onClick={() => setGuideOpen(true)}><BookOpen size={16} /> Teaching guide</button>} />
-      <ContextStrip title="Explore the PC" description="Take apart a finished desktop and learn what each part does." actions={<button className={`outlined-button ${focusMode ? 'active' : ''}`} aria-pressed={focusMode} onClick={() => setFocusMode(!focusMode)}><Maximize size={16} /> {focusMode ? 'Exit focus mode' : 'Focus mode'}</button>} />
+      <AppHeader mode="explore" onModeChange={onModeChange} />
+      <ContextStrip title="Explore the PC" actions={<button className={`outlined-button ${focusMode ? 'active' : ''}`} aria-pressed={focusMode} onClick={() => setFocusMode(!focusMode)}><Maximize size={16} /> {focusMode ? 'Exit focus mode' : 'Focus mode'}</button>} />
 
       <main className="workbench" data-panel={panel}>
         <aside className="component-sidebar" aria-label="Computer components">
-          <div className="sidebar-heading"><h2>Components</h2><span className="count-badge">10</span></div>
-          <label className="component-search"><Search size={15} /><input type="search" placeholder="Find a component…" aria-label="Find a component" value={query} onChange={(event) => setQuery(event.target.value)} /></label>
+          <div className="sidebar-heading"><h2>Components</h2></div>
           <div ref={libraryList} className="component-list">
             {groups.map((group) => {
-              const matches = COMPONENTS.filter((part) => part.category === group && `${part.name} ${part.short}`.toLowerCase().includes(query.toLowerCase()));
+              const matches = COMPONENTS.filter((part) => part.category === group);
               return matches.length > 0 && <section className="component-group" key={group}><h3>{group}</h3>{matches.map((part) => {
-                const Icon = ICONS[part.id]; const isHidden = hidden.includes(part.id); const state = removed.includes(part.id) ? { tone: 'removed', StatusIcon: CircleMinus, label: 'Removed from the PC' } : isHidden ? { tone: 'hidden', StatusIcon: EyeOff, label: 'Hidden in 3D view' } : visited.includes(part.id) ? { tone: 'viewed', StatusIcon: Check, label: 'Viewed' } : { tone: 'new', StatusIcon: Circle, label: 'Not viewed yet' };
+                const Icon = ICONS[part.id]; const isHidden = hidden.includes(part.id); const state = removed.includes(part.id) ? { tone: 'removed', StatusIcon: CircleMinus, label: 'Removed from the PC' } : isHidden ? { tone: 'hidden', StatusIcon: EyeOff, label: 'Hidden in 3D view' } : null;
                 return <div className={`component-row ${selected === part.id ? 'selected' : ''} ${isHidden ? 'is-hidden' : ''}`} key={part.id} data-part={part.id}>
-                  <button className="component-select" onClick={() => select(part.id)} aria-pressed={selected === part.id}><span className="part-tile"><Icon size={18} strokeWidth={1.6} /></span><span className="part-info"><span className="part-name">{part.name}</span><span className={`part-status part-status--${state.tone}`}><state.StatusIcon size={12} aria-hidden="true" />{state.label}</span></span></button>
+                  <button className="component-select" onClick={() => select(part.id)} aria-pressed={selected === part.id}><span className="part-tile"><Icon size={18} strokeWidth={1.6} /></span><span className="part-info"><span className="part-name">{part.name}</span>{state && <span className={`part-status part-status--${state.tone}`}><state.StatusIcon size={12} aria-hidden="true" />{state.label}</span>}</span></button>
                   <button className="visibility-button" title={`${isHidden ? 'Show' : 'Hide'} ${part.name.toLowerCase()}`} aria-label={`${isHidden ? 'Show' : 'Hide'} ${part.name.toLowerCase()}`} aria-pressed={isHidden} onClick={() => toggleHidden(part.id)}>{isHidden ? <EyeOff size={16} /> : <Eye size={16} />}</button>
                 </div>;
               })}</section>;
             })}
-            {COMPONENTS.every((part) => !`${part.name} ${part.short}`.toLowerCase().includes(query.toLowerCase())) && <p className="empty-search">No matching components.<button onClick={() => setQuery('')}>Clear search</button></p>}
           </div>
-          <div className="discovery-progress"><div><span>{visited.length === 10 ? 'You explored every part!' : 'Your exploration'}</span><span>{visited.length}<span className="muted"> / 10</span></span></div><div className="progress-track"><span style={{ width: `${visited.length * 10}%` }} /></div><p>A little curiosity goes a long way.</p></div>
         </aside>
 
         <section className="viewport-panel" aria-label="Interactive 3D computer">
           <ViewportToolbar view={view} onView={changeView} labels={labels} onLabels={setLabels} autoRotate={autoRotate} onAutoRotate={setAutoRotate} onZoom={(factor) => viewport.current?.zoom(factor)} onFit={() => viewport.current?.fit()} />
           <div className="viewport-stage">
             <PCViewport ref={viewport} selected={selected} removed={removed} hidden={hidden} explode={explode / 100} isolate={isolate} labels={labels} autoRotate={autoRotate} onSelect={(id) => { select(id); if (id) setPanel('details'); }} />
-            <div className="model-caption"><span className="status-dot" /> {isolate && info ? `Inspecting ${info.short}` : explode > 0 ? 'Exploded assembly' : removed.length ? `${removed.length} ${removed.length === 1 ? 'part' : 'parts'} removed` : 'ATX mid-tower'}<span className="caption-divider">/</span><span>Interactive 3D model</span></div>
+            {(isolate || explode > 0 || removed.length > 0) && <div className="model-caption"><span className="status-dot" /> {isolate && info ? `Inspecting ${info.short}` : explode > 0 ? 'Exploded assembly' : removed.length ? `${removed.length} ${removed.length === 1 ? 'part' : 'parts'} removed` : null}</div>}
             {isolate && <button className="exit-isolate" onClick={() => setIsolate(false)}><ArrowLeft size={14} /> Back to computer</button>}
             {guided && <div className="guided-strip"><div className="guide-step-number">{Math.min(removed.length + 1, 9)}</div><div><strong>{nextStep ? `Next: ${nameOf(nextStep)}` : 'You’ve taken the PC apart.'}</strong><span>{nextStep ? `Step ${removed.length + 1} of 9 · Select the part to learn more` : 'Every component has a role. Ready to rebuild?'}</span></div><button className="icon-button" aria-label="Exit guided disassembly" onClick={() => setGuided(false)}><X size={16} /></button></div>}
             {toast && <div className="lab-toast" role="status"><Check size={16} />{toast}</div>}
@@ -133,7 +125,6 @@ export default function HardwareLab({ onModeChange }: { onModeChange: (mode: Mod
             <div className="assembly-controls">
               {guided ? <><button className="outlined-button compact" disabled={!removed.length} aria-label="Previous disassembly step" onClick={() => { const last = REMOVAL_ORDER.filter((id) => removed.includes(id)).at(-1); if (last) { setRemoved(removed.filter((id) => id !== last)); select(last); } }}><ArrowLeft size={16} /></button><div className="guided-progress"><span>{removed.length} of 9 parts removed</span><AssemblyRail label="Disassembly progress" steps={railSteps(REMOVAL_ORDER, (id) => removed.includes(id), nextStep ?? null, nameOf)} doneWord="removed" /></div><button className="primary-button" onClick={() => nextStep ? removePart(nextStep) : reset()}>{nextStep ? `Remove ${COMPONENTS.find((part) => part.id === nextStep)!.short.toLowerCase()}` : 'Reassemble'}<ArrowRight size={15} /></button></> : <><button className="explode-button" aria-pressed={explode > 0} onClick={() => { setIsolate(false); setRemoved([]); setExplode(explode > 0 ? 0 : 100); }}><Layers size={17} /><span>{explode > 0 ? 'Assemble' : 'Explode view'}</span></button><div className="explode-slider"><div><label id="explode-label">Component spacing</label><output>{explode}%</output></div><Slider aria-labelledby="explode-label" value={[explode]} min={0} max={100} step={1} onValueChange={(values) => { setExplode(Array.isArray(values) ? values[0] : values); setRemoved([]); setIsolate(false); }} /></div><button className="reset-button" onClick={reset} title="Reset assembly (R)"><RotateCcw size={16} /><span>Reset</span></button></>}
             </div>
-            <div className="interaction-hints"><span><MousePointer2 size={12} /> Drag to orbit</span><span><Move size={12} /> Right-drag to pan</span><span>Scroll to zoom</span><button onClick={() => setGuideOpen(true)} aria-label="Help with controls"><CircleHelp size={14} /></button></div>
           </div>
         </section>
 
@@ -151,7 +142,6 @@ export default function HardwareLab({ onModeChange }: { onModeChange: (mode: Mod
           </div></div>}
         </aside>
       </main>
-      <Dialog open={guideOpen} onOpenChange={setGuideOpen}><DialogContent className="teaching-dialog"><DialogTitle>Welcome to BuildBench.</DialogTitle><DialogDescription>A hands-on way to explore what’s inside a desktop computer.</DialogDescription><div className="guide-content"><h3>Make it your own lesson</h3><ol><li><strong>Explore the assembled computer.</strong> Orbit around the tower and identify the enclosure, ventilation and connections.</li><li><strong>Open it up.</strong> Start guided disassembly, or use the spacing slider to reveal every part at once.</li><li><strong>Ask what each part does.</strong> Select a component, read its role and isolate it for a closer look.</li><li><strong>Connect the ideas.</strong> Compare working memory with storage, or explain the path of heat from CPU to room.</li></ol><h3>Controls</h3><dl className="guide-shortcuts"><div><dt>Orbit</dt><dd>Left-drag / one-finger drag</dd></div><div><dt>Pan</dt><dd>Right-drag / two-finger drag</dd></div><div><dt>Zoom</dt><dd>Scroll / pinch / + and − buttons</dd></div><div><dt>Keyboard on 3D view</dt><dd>Arrow keys pan · + / − zoom</dd></div><div><dt>Reset / labels</dt><dd>R / L</dd></div><div><dt>Exit focus or isolation</dt><dd>Escape</dd></div></dl><h3>About the model</h3><p>A generic ATX desktop with ten component groups. The RAM pair and front fan pair are grouped for teaching. Illustrative specifications are not a parts shopping list. Disassembly animations simplify cables, screws and latches; this is not a physical repair procedure.</p><p className="hardware-safety">For real hardware, shut down, unplug mains power, follow the component manuals and use anti-static precautions. Never open the power supply.</p><p className="guide-sources">Further reading: <a href="https://www.intel.com/content/www/us/en/gaming/resources/how-to-build-a-gaming-pc.html" target="_blank" rel="noreferrer">Intel’s PC assembly guide</a> · <a href="https://threejs.org/" target="_blank" rel="noreferrer">Three.js</a></p></div><button className="primary-button" onClick={() => { setGuideOpen(false); startGuide(); }}>Let’s take it apart <ArrowRight size={16} /></button></DialogContent></Dialog>
     </div>
   );
 }

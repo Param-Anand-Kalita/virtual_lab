@@ -189,7 +189,7 @@ export default function CompatibilityChecker({ onModeChange }: { onModeChange: (
   return (
     <div className="lab-app">
       <AppHeader mode="compatibility" onModeChange={onModeChange} />
-      <ContextStrip title="Check compatibility" description="Pick a CPU, motherboard, RAM kit and case, then see which of three documented rules they pass." />
+      <ContextStrip title="Check compatibility" />
 
       <main className="compat-layout">
         <section className="compat-panel" aria-labelledby="compat-parts-title">

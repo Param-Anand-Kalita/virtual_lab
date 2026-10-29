@@ -18,7 +18,6 @@ export function AppHeader({ mode, onModeChange, actions }: { mode: Mode; onModeC
       <span className="brand">
         <span className="brand-mark"><Box size={20} strokeWidth={1.7} /></span>
         <span className="brand-name">Build<span className="brand-accent">Bench</span></span>
-        <span className="brand-sub"> — Virtual PC Assembly Lab</span>
       </span>
       <nav className="mode-nav" aria-label="Lab modes">
         {MODES.map(({ mode: id, label, Icon }) => (
@@ -33,10 +32,10 @@ export function AppHeader({ mode, onModeChange, actions }: { mode: Mode; onModeC
 }
 
 /** The compact strip under the header: the one h1 of the page, what this mode is for, and an optional action. */
-export function ContextStrip({ title, description, actions }: { title: string; description: string; actions?: ReactNode }) {
+export function ContextStrip({ title, description, actions }: { title: string; description?: string; actions?: ReactNode }) {
   return (
     <section className="context-strip">
-      <div><h1>{title}</h1><p>{description}</p></div>
+      <div><h1>{title}</h1>{description && <p>{description}</p>}</div>
       {actions}
     </section>
   );

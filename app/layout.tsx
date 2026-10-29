@@ -13,11 +13,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'BuildBench — Virtual PC Assembly Lab',
+  title: 'BuildBench',
   applicationName: 'BuildBench',
   description: 'Explore a 3D desktop PC, assemble one from an empty workbench by dragging parts onto their mounts, and check a CPU, motherboard, RAM kit and case against three documented fit rules.',
   icons: { icon: '/favicon.svg' },
-  openGraph: { title: 'BuildBench — Virtual PC Assembly Lab', siteName: 'BuildBench', type: 'website' },
+  openGraph: { title: 'BuildBench', siteName: 'BuildBench', type: 'website' },
 };
 
 /** viewport-fit=cover lets the layout use env(safe-area-inset-*) on notched phones. User zoom is left enabled. */

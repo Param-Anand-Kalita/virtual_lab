@@ -17,7 +17,6 @@ import {
   Maximize,
   MemoryStick,
   Monitor,
-  MousePointer2,
   Move,
   Package,
   PanelLeft,
@@ -313,7 +312,6 @@ export default function BuildMode({ onModeChange }: { onModeChange: (mode: Mode)
       <AppHeader mode="build" onModeChange={onModeChange} />
       <ContextStrip
         title="Build a PC"
-        description="Drag each part from the tray onto its highlighted mount, in a valid order."
         actions={
           <button className={`outlined-button ${focusMode ? 'active' : ''}`} aria-pressed={focusMode} onClick={() => setFocusMode(!focusMode)}>
             <Maximize size={16} /> {focusMode ? 'Exit focus mode' : 'Focus mode'}
@@ -328,13 +326,6 @@ export default function BuildMode({ onModeChange }: { onModeChange: (mode: Mode)
             <h2>Parts tray</h2>
             <span className="count-badge">{PART_IDS.length - installed.length} left</span>
           </div>
-
-          {next && (
-            <div className="build-next-hint">
-              <Sparkles size={13} />
-              <span>Next: <strong>{nameOf(next)}</strong></span>
-            </div>
-          )}
 
           <div ref={trayList} className="component-list build-parts-list">
             {BUILD_ORDER.map((id) => {
@@ -369,7 +360,7 @@ export default function BuildMode({ onModeChange }: { onModeChange: (mode: Mode)
                   <div className="part-info">
                     <span className="part-name">
                       {shortOf(id)}
-                      {isLoose ? <span className="part-tag part-tag--loose">Loose</span> : id === next ? <span className="part-tag part-tag--next">Next</span> : null}
+                      {isLoose ? <span className="part-tag part-tag--loose">Loose</span> : null}
                     </span>
                     <span className="part-status" title={isLocked ? `Needs ${needs.join(', ')} first` : undefined}>
                       {StatusIcon && <StatusIcon size={12} aria-hidden="true" />}
@@ -408,6 +399,9 @@ export default function BuildMode({ onModeChange }: { onModeChange: (mode: Mode)
               onDragFeedback={showDragZone}
               onDrop={completeDrop}
             />
+            {installed.length === 0 && Object.keys(loose).length === 0 && dragZone === 'outside' && !sceneDrag && (
+              <div className="empty-stage-hint">Drag and drop a part here to start building</div>
+            )}
 
             {dragging && (dragZone !== 'outside' || sceneDrag) && (
               <output className={`drag-target-hint ${dragZone === 'target' ? 'on-target' : ''}`}>
@@ -445,11 +439,6 @@ export default function BuildMode({ onModeChange }: { onModeChange: (mode: Mode)
                   <button key="reset" className="reset-button" onClick={reset} title="Reset build (R)"><RotateCcw size={16} /><span>Reset</span></button>
                 </>
               )}
-            </div>
-            <div className="interaction-hints">
-              <span><MousePointer2 size={12} /> Drag to orbit</span>
-              <span><Move size={12} /> Right-drag to pan</span>
-              <span>Drag parts onto their highlighted mount · Esc cancels</span>
             </div>
           </div>
         </section>
