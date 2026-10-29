@@ -9,7 +9,6 @@ import {
   CircuitBoard,
   Cpu,
   Fan,
-  Focus,
   GripVertical,
   HardDrive,
   Layers,
@@ -23,9 +22,6 @@ import {
   PartyPopper,
   Power,
   RotateCcw,
-  Search,
-  Sparkles,
-  X,
 } from 'lucide-react';
 import { COMPONENTS, PART_IDS, type PartId } from '@/lib/components-data';
 import { BUILD_ORDER, MOUNT_SITES, canInstall, missingRequirements, nextBuildStep, partLocation, releaseUnavailableLoose, resolveDrop, trayParts, uninstallWithDependents, withoutLoose, type DropPoint, type LoosePlacements } from '@/lib/assembly';
@@ -87,12 +83,14 @@ export default function BuildMode({ onModeChange }: { onModeChange: (mode: Mode)
   // The 3D viewport shows "removed" = everything NOT installed, but only loose parts are drawn: parts still in the tray are hidden.
   const removed = PART_IDS.filter((id) => !installed.includes(id));
   const hidden = trayParts(installed, loose);
-  const info = COMPONENTS.find((part) => part.id === selected);
-  const InfoIcon = info ? ICONS[info.id] : Box;
+  const selectedInfo = COMPONENTS.find((part) => part.id === selected);
+  // With nothing selected the details tab shows the part to install next (the chassis on an empty bench).
+  const info = selectedInfo ?? COMPONENTS.find((part) => part.id === (next ?? 'case'))!;
+  const InfoIcon = ICONS[info.id];
   // What the inspector says about the selected part comes from the same state as the tray: installed, loose in the workspace, or still in the tray.
-  const location = info ? partLocation(info.id, installed, loose) : 'tray';
+  const location = partLocation(info.id, installed, loose);
   const inspectorState: PartState = location === 'installed' ? { tone: 'ok', Icon: Check, label: 'Installed' } : location === 'loose' ? { tone: 'caution', Icon: Move, label: 'Loose in workspace' } : { tone: 'neutral', Icon: Package, label: 'In the parts tray' };
-  const showActions = !!info && (installed.includes(info.id) ? info.id !== 'case' : canInstall(info.id, installed));
+  const showActions = installed.includes(info.id) && info.id !== 'case';
   // One rail segment per part in BUILD_ORDER, derived from `installed`: the rail keeps no progress of its own.
   const steps = railSteps(BUILD_ORDER, (id) => installed.includes(id), next, nameOf);
 
@@ -443,61 +441,26 @@ export default function BuildMode({ onModeChange }: { onModeChange: (mode: Mode)
           </div>
         </section>
 
-        <PanelTabs panel={panel} onPanel={setPanel} detail={info?.short ?? null} />
+        <PanelTabs panel={panel} onPanel={setPanel} detail={selectedInfo?.short ?? null} />
 
         {/* ── Inspector (right sidebar) ── */}
         <aside className="inspector" aria-label="Component information">
-          <div className="inspector-top">
-            <span>{info ? 'Component details' : 'Build your PC'}</span>
-            {info && <button className="icon-button" aria-label="Close component details" onClick={() => setSelected(null)}><X size={16} /></button>}
-          </div>
-
-          {info ? (
-            <PartInspector
-              key={info.id}
-              info={info}
-              Icon={InfoIcon}
-              state={inspectorState}
-              guidance={<InstallGuidance id={info.id} installed={installed} loose={loose} />}
-              actions={showActions ? (
-                <>
-                  {!installed.includes(info.id) && canInstall(info.id, installed) && (
-                    <button className="primary-button full-width" onClick={() => installPart(info.id)}>
-                      <Layers size={16} /> Install this component
-                    </button>
-                  )}
-                  {installed.includes(info.id) && info.id !== 'case' && (
-                    <button className="outlined-button full-width" onClick={() => uninstallPart(info.id)}>
-                      <Layers size={16} /> Remove component
-                    </button>
-                  )}
-                </>
-              ) : undefined}
-            />
-          ) : (
-            <div className="inspector-body">
-              {next && <div className="inspector-next"><InstallGuidance id={next} installed={installed} loose={loose} heading="Next step" /></div>}
-              <div className="overview-detail build-overview">
-                <div className="overview-illustration"><Layers size={52} strokeWidth={1} /><span className="mini-chip"><Sparkles size={21} strokeWidth={1.5} /></span></div>
-                <span className="lesson-tag">Build mode</span>
-                <h2>Build your<br />dream PC.</h2>
-                <p>Drag components from the parts tray on the left and drop them onto the 3D workspace to assemble your computer step by step.</p>
-                <div className="how-to-item">
-                  <span><GripVertical size={17} /></span>
-                  <div><strong>Drag from the tray</strong><p>Grab a ready component and drag it to the 3D view.</p></div>
-                </div>
-                <div className="how-to-item">
-                  <span><Layers size={17} /></span>
-                  <div><strong>Find its mount</strong><p>The part’s mounting position glows while you drag. Release over it and the part snaps into place.</p></div>
-                </div>
-                <div className="how-to-item">
-                  <span><Focus size={17} /></span>
-                  <div><strong>Follow the guide</strong><p>Blue-highlighted parts are ready to install next.</p></div>
-                </div>
-                <p className="example-note">Components must be installed in a valid order — just like building a real PC. The motherboard goes in before the CPU, the case before anything else.</p>
-              </div>
-            </div>
-          )}
+          <PartInspector
+            key={info.id}
+            info={info}
+            Icon={InfoIcon}
+            state={inspectorState}
+            guidance={<InstallGuidance id={info.id} installed={installed} loose={loose} nextId={next} />}
+            actions={showActions ? (
+              <>
+                {installed.includes(info.id) && info.id !== 'case' && (
+                  <button className="outlined-button full-width" onClick={() => uninstallPart(info.id)}>
+                    <Layers size={16} /> Remove component
+                  </button>
+                )}
+              </>
+            ) : undefined}
+          />
         </aside>
       </main>
 

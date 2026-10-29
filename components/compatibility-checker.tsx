@@ -151,10 +151,10 @@ function CheckCard({ check }: { check: CheckResult }) {
       </div>
       <div className="compat-card-body">
         <p className="compat-explanation">{check.explanation}</p>
-        <div className="compat-evidence">
-          <h4>Based on</h4>
+        <details className="compat-evidence">
+          <summary>Based on {check.evidence.length} {check.evidence.length === 1 ? 'source' : 'sources'}</summary>
           <ul>{check.evidence.map((line) => <li key={line}>{line}</li>)}</ul>
-        </div>
+        </details>
       </div>
     </li>
   );
@@ -231,8 +231,8 @@ export default function CompatibilityChecker({ onModeChange }: { onModeChange: (
             )}
           </div>
 
-          <section className="compat-limits" aria-labelledby="compat-limits-title">
-            <h3 id="compat-limits-title"><Info size={14} /> What this checks, and what it does not</h3>
+          <details className="compat-limits">
+            <summary><Info size={14} /> What this checks, and what it does not</summary>
             <h4>Checked</h4>
             <ul>
               <li>CPU socket against the motherboard socket.</li>
@@ -242,7 +242,7 @@ export default function CompatibilityChecker({ onModeChange }: { onModeChange: (
             <h4>Not checked</h4>
             <p>BIOS or chipset support for a specific CPU, CPU memory-controller limits, memory speed or capacity, DIMM type, cooler height, graphics card length, power supply wattage and connectors, and storage.</p>
             <p>Specifications come from manufacturer pages on the dates shown and may have changed since. Demo entries are illustrative and not manufacturer-verified. A rule is UNVERIFIED when its data is missing, and is never assumed to pass.</p>
-          </section>
+          </details>
         </section>
       </main>
     </div>

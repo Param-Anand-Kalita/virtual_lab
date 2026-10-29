@@ -14,7 +14,7 @@ type Tone = 'ready' | 'loose' | 'locked' | 'done';
  * Where a part belongs, what it needs and what to do next, derived only from the build state and the existing
  * assembly exports. Nothing here is stored: it is recomputed from `installed` and `loose` on every render.
  */
-export default function InstallGuidance({ id, installed, loose, heading = 'Installation' }: { id: PartId; installed: PartId[]; loose: LoosePlacements; heading?: string }) {
+export default function InstallGuidance({ id, installed, loose, heading = 'Installation', nextId }: { id: PartId; installed: PartId[]; loose: LoosePlacements; heading?: string; nextId?: PartId | null }) {
   const location = partLocation(id, installed, loose);
   const requirements = [...INSTALL_REQUIREMENTS[id]].sort(inBuildOrder);
   const missing = missingRequirements(id, installed).sort(inBuildOrder);
@@ -36,12 +36,12 @@ export default function InstallGuidance({ id, installed, loose, heading = 'Insta
     text = `Loose in the workspace and not installed. Pick it up in the 3D view or from its tray card and drop it on the ${mount}, or press Install.`;
   } else {
     tone = 'ready';
-    text = `${isNext ? 'Next step. ' : ''}Drag it from the tray onto the highlighted ${mount}, or press Install.`;
+    text = `${isNext && id !== 'case' ? 'Next step. ' : ''}Drag it from the tray onto the highlighted ${mount}, or press Install.`;
   }
 
   return (
     <section className="install-guide" aria-label={heading}>
-      <h3>{heading}{heading === 'Next step' ? `: ${shortOf(id)}` : ''}</h3>
+      {heading !== 'Next step' && <h3>{heading}</h3>}
       <p className={`guide-next guide-next--${tone}`}><Icon size={16} aria-hidden="true" /><span>{text}</span></p>
       <dl className="guide-facts"><div><dt>Belongs at</dt><dd>{capitalise(mount)}</dd></div></dl>
       <h4>Requires</h4>
@@ -51,6 +51,12 @@ export default function InstallGuidance({ id, installed, loose, heading = 'Insta
             const met = installed.includes(req);
             return <li key={req} className={met ? 'req-met' : 'req-missing'}>{met ? <Check size={14} aria-hidden="true" /> : <Circle size={14} aria-hidden="true" />}<span>{shortOf(req)}</span><em>{met ? 'Installed' : 'Missing'}</em></li>;
           })}</ul>}
+      {nextId && nextId !== id && (
+        <>
+          <h4>Next step</h4>
+          <p className="guide-next guide-next--ready"><ArrowRight size={16} aria-hidden="true" /><span>Install the {shortOf(nextId).toLowerCase()}: drag it from the tray onto the highlighted {MOUNT_SITES[nextId]}, or press Install.</span></p>
+        </>
+      )}
     </section>
   );
 }
