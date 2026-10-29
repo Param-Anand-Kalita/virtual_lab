@@ -120,9 +120,6 @@ export default function BudgetPlanner({ onModeChange }: { onModeChange: (mode: M
               <summary>Retailer details</summary>
               <ul>
                 <li><strong>Counted from:</strong> {joinList(COVERAGE.counted)}.</li>
-                {COVERAGE.checkedOnly.length > 0 && <li><strong>Also checked, none counted:</strong> {joinList(COVERAGE.checkedOnly)} (out of stock, or a different variant or model).</li>}
-                <li>Only in-stock listings of the exact model are counted. Marketplace listings are not.</li>
-                <li>Prices are a snapshot, not live prices.</li>
               </ul>
             </details>
           </div>

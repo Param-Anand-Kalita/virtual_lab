@@ -72,12 +72,6 @@ export const MOTHERBOARDS: Motherboard[] = [
       { kind: 'manufacturer', url: 'https://storage-asset.msi.com/datasheet/mb/global/PRO-B760M-A-WIFI-DDR4.pdf', checked: CHECKED, note: 'Datasheet: CPU Socket LGA 1700; DDR4. The datasheet does not state a form factor.' },
     ],
   },
-  {
-    // Demo data: socket is deliberately missing so rule 1 reports UNVERIFIED.
-    id: 'demo-motherboard-no-socket', brand: 'Demo', model: 'Demo motherboard (socket not listed)',
-    memoryType: 'DDR5', formFactor: 'ATX', widthMm: 244,
-    sources: [{ kind: 'demo', note: 'Illustrative demo data, not manufacturer-verified. The socket is intentionally not listed.' }],
-  },
 ];
 
 export const RAM_KITS: RamKit[] = [
@@ -122,11 +116,5 @@ export const CASES: PcCase[] = [
       { kind: 'manufacturer', url: 'https://www.fractal-design.com/products/cases/define/define-7/', checked: CHECKED, note: 'Motherboard compatibility: E-ATX, ATX, Micro ATX, Mini ITX (Define 7 Black product page)' },
       { kind: 'manufacturer', url: 'https://support.fractal-design.com/support/solutions/articles/4000158697-define-7-meshify-2-fitment-of-an-eatx-motherboard', checked: CHECKED, note: 'The Define 7 and Meshify 2 can support EATX motherboards up to 285mm wide. Boards wider than a standard ATX board (244mm) block part of the cable routing grommets.' },
     ],
-  },
-  {
-    // Demo data: E-ATX is listed with no documented maximum width, so rule 3 reports UNVERIFIED for an E-ATX board.
-    id: 'demo-case-no-width-limit', brand: 'Demo', model: 'Demo case (E-ATX listed, maximum width not stated)',
-    supportedFormFactors: ['E-ATX', 'ATX'],
-    sources: [{ kind: 'demo', note: 'Illustrative demo data, not manufacturer-verified. The maximum E-ATX board width is intentionally not stated.' }],
   },
 ];

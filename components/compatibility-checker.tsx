@@ -193,14 +193,12 @@ export default function CompatibilityChecker({ onModeChange }: { onModeChange: (
       <main className="compat-layout">
         <section className="compat-panel" aria-labelledby="compat-parts-title">
           <h2 id="compat-parts-title">Parts bench</h2>
-          <p className="compat-intro">Products are real models with manufacturer-sourced specifications, plus two clearly marked demo entries.</p>
           <div className="compat-slots">
             <PartSelect field={CPU_FIELD} value={choice.cpu} onChange={(id) => change('cpu', id)} />
             <PartSelect field={BOARD_FIELD} value={choice.motherboard} onChange={(id) => change('motherboard', id)} />
             <PartSelect field={RAM_FIELD} value={choice.ram} onChange={(id) => change('ram', id)} />
             <PartSelect field={CASE_FIELD} value={choice.pcCase} onChange={(id) => change('pcCase', id)} />
           </div>
-          <p className="compat-intro compat-hint">Changing a selection clears the results. Run the check again to update them.</p>
           <div className="compat-actions">
             <button className="primary-button" onClick={run}><Play size={15} /> Run compatibility check</button>
             <button className="outlined-button" onClick={clear} disabled={!hasChoice && !report && !stale}><RotateCcw size={15} /> Clear</button>
@@ -215,8 +213,8 @@ export default function CompatibilityChecker({ onModeChange }: { onModeChange: (
                 <div className={`compat-banner compat-banner--${overall.tone}`}>
                   <overall.Icon size={26} strokeWidth={1.6} />
                   <div>
-                    <h3>{overall.headline}</h3>
-                    <p>{report.summary}</p>
+                    <h3>{report.overall === 'FAILED' ? report.summary : overall.headline}</h3>
+                    {report.overall !== 'FAILED' && <p>{report.summary}</p>}
                     {report.overall === 'ALL_CHECKS_PASSED' && <p>Only CPU socket, memory type and motherboard–case fit were checked. This is not a guarantee that the full build is compatible.</p>}
                   </div>
                 </div>
@@ -231,16 +229,12 @@ export default function CompatibilityChecker({ onModeChange }: { onModeChange: (
           </div>
 
           <details className="compat-limits">
-            <summary><Info size={14} /> What this checks, and what it does not</summary>
-            <h4>Checked</h4>
+            <summary><Info size={14} /> What this checks</summary>
             <ul>
               <li>CPU socket against the motherboard socket.</li>
               <li>RAM memory type (DDR4 or DDR5) against the motherboard memory type.</li>
               <li>Motherboard form factor, and its width where the case documents a limit, against the case.</li>
             </ul>
-            <h4>Not checked</h4>
-            <p>BIOS or chipset support for a specific CPU, CPU memory-controller limits, memory speed or capacity, DIMM type, cooler height, graphics card length, power supply wattage and connectors, and storage.</p>
-            <p>Specifications come from manufacturer pages on the dates shown and may have changed since. Demo entries are illustrative and not manufacturer-verified. A rule is UNVERIFIED when its data is missing, and is never assumed to pass.</p>
           </details>
         </section>
       </main>

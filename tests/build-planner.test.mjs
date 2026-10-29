@@ -404,10 +404,9 @@ test('real catalogue: unpriced models are excluded and explained; priced ones ar
   const excluded = new Map(result.excluded.map((m) => [m.id, m]));
   assert.deepEqual([...excluded.keys()].sort(), [
     'asus-rog-maximus-z790-extreme', 'asus-rog-strix-b650e-i-gaming-wifi', 'cooler-master-masterbox-q300l', 'corsair-cmk16gx4m2b3200c16',
-    'corsair-cmk32gx5m2b6000c30', 'demo-case-no-width-limit', 'demo-motherboard-no-socket', 'fractal-design-define-7', 'msi-mag-b550-tomahawk',
+    'corsair-cmk32gx5m2b6000c30', 'fractal-design-define-7', 'msi-mag-b550-tomahawk',
   ].sort());
   for (const model of result.excluded) assert(model.explanation.length > 10, `${model.id} has an explanation`);
-  assert.equal(excluded.get('demo-motherboard-no-socket').reason, 'demo');
   assert.equal(excluded.get('msi-mag-b550-tomahawk').reason, 'variant-ambiguous');
   assert.equal(excluded.get('fractal-design-define-7').reason, 'out-of-stock-only');
   assert.deepEqual(result.emptySlots, []);

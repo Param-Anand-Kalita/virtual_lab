@@ -126,7 +126,7 @@ test('13: catalogue integrity and source traceability', () => {
   const all = [...CPUS, ...MOTHERBOARDS, ...RAM_KITS, ...CASES];
   assert.equal(new Set(all.map((item) => item.id)).size, all.length, 'ids are unique');
   const demos = all.filter((item) => item.sources.some((source) => source.kind === 'demo'));
-  assert.deepEqual(demos.map((item) => item.id).sort(), ['demo-case-no-width-limit', 'demo-motherboard-no-socket']);
+  assert.deepEqual(demos, [], 'the catalogue holds real models only');
   for (const item of all) {
     assert(item.sources.length > 0, `${item.id} has a source`);
     const kinds = new Set(item.sources.map((source) => source.kind));
@@ -231,8 +231,6 @@ test('catalogue: the reviewed demonstration combinations give the documented res
     ['intel-core-i5-13400f', 'asus-rog-maximus-z790-extreme', 'corsair-cmk32gx5m2b6000c30', 'cooler-master-masterbox-q300l', ['PASSED', 'PASSED', 'FAILED'], 'FAILED'],
     ['amd-ryzen-5-7600', 'asus-rog-strix-b650-a-gaming-wifi', 'corsair-cmk32gx5m2b6000c30', 'cooler-master-masterbox-q300l', ['PASSED', 'PASSED', 'FAILED'], 'FAILED'],
     ['amd-ryzen-5-5600x', 'asus-rog-strix-b650-a-gaming-wifi', 'corsair-cmk32gx5m2b6000c30', 'cooler-master-masterbox-q300l', ['FAILED', 'PASSED', 'FAILED'], 'FAILED'],
-    ['amd-ryzen-5-7600', 'demo-motherboard-no-socket', 'corsair-cmk32gx5m2b6000c30', 'nzxt-h5-flow-2024', ['UNVERIFIED', 'PASSED', 'PASSED'], 'UNVERIFIED'],
-    ['intel-core-i5-13400f', 'asus-rog-maximus-z790-extreme', 'corsair-cmk32gx5m2b6000c30', 'demo-case-no-width-limit', ['PASSED', 'PASSED', 'UNVERIFIED'], 'UNVERIFIED'],
   ];
   for (const [cpuId, boardId, ramId, caseId, expectedStatuses, overall] of combos) {
     const report = checkCompatibility({ cpu: part.cpu(cpuId), motherboard: part.board(boardId), ram: part.ram(ramId), pcCase: part.pcCase(caseId) });

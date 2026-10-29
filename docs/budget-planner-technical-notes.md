@@ -66,7 +66,7 @@ These numbers come from running the project's own planner (`planBuilds(...).stat
 
 ### 4.1 Rules only, all real models
 
-The catalogue has 15 real models (3 CPUs, 5 motherboards, 4 RAM kits, 3 cases) plus 2 demo entries that are never searched. That gives 3 x 5 x 4 x 3 = **180 combinations**.
+The catalogue has 15 real models (3 CPUs, 5 motherboards, 4 RAM kits, 3 cases). That gives 3 x 5 x 4 x 3 = **180 combinations**.
 
 | | Count |
 |---|---|
@@ -76,7 +76,7 @@ The catalogue has 15 real models (3 CPUs, 5 motherboards, 4 RAM kits, 3 cases) p
 | Branches cut by CPU-motherboard socket | 10 |
 | Branches cut by RAM-motherboard memory type | 10 |
 | Branches cut by motherboard-case fit | 6 |
-| Branches cut as UNVERIFIED | 0 (the demo entries that trigger it are excluded) |
+| Branches cut as UNVERIFIED | 0 |
 
 ### 4.2 With prices and budgets
 
@@ -99,7 +99,7 @@ At ₹60,000 the budget bound removes the more expensive branch before its parts
 - **Retailers.** Approved retailers are MD Computers, PrimeABGB, Vedant Computers, EliteHubs, Computech Store and PC Studio. Counted prices come from the first four. Computech Store and PC Studio were checked but contributed only listings that were not counted. Amazon and Flipkart third-party listings are not used.
 - **Confidence.** A price with a single observation is flagged single-source (`lowConfidence` in the planner's output) and its range is that one price. Both priced builds contain at least one such part. The page shows each part's source count but does not display a separate confidence warning.
 - **Variants.** The NZXT H5 Flow (2024) is priced for the white CC-H52FW-01 only. The Fractal Define 7 is the Black Solid FD-C-DEF7A-01, which is out of stock, so it is unpriced. Ryzen 5 5600X OEM packs are excluded. The MSI MAG B550 TOMAHAWK WIFI is treated as a different model from the TOMAHAWK in the catalogue.
-- **Exclusions.** 7 real models have no verified price (ASUS B650E-I, ASUS Z790 EXTREME, MSI B550 TOMAHAWK, both original Corsair RAM kits, Cooler Master Q300L, Fractal Define 7) and are listed on the page with their reasons. The two demo entries are never priced.
+- **Exclusions.** 7 real models have no verified price (ASUS B650E-I, ASUS Z790 EXTREME, MSI B550 TOMAHAWK, both original Corsair RAM kits, Cooler Master Q300L, Fractal Define 7) and are listed on the page with their reasons.
 - **Dates.** Prices were researched on 29 October 2026. They are a snapshot.
 
 ## 6. Verification
@@ -109,7 +109,7 @@ At ₹60,000 the budget bound removes the more expensive branch before its parts
 - **Backtracking behaviour.** Tests count nodes and prunes on small catalogues to show a failing pair removes its whole subtree, that UNVERIFIED data prunes and is counted separately, and that a wrong board is never explored further.
 - **Boundaries.** Budget equal to the highest total (within), one rupee below it (may exceed), equal to the lowest total (may exceed), one rupee below that (dropped).
 - **Real catalogue.** The 180 combinations give exactly 24 compatible builds; the priced search gives exactly 2; at ₹60,000 only the Intel build appears; the Ryzen build appears as "may exceed" from ₹86,607 and as "within" from ₹87,355.
-- **Data consistency.** Every stored minimum, median and maximum is checked against its observations; every price record points at a real catalogue id; demo entries have none; retailers are approved; no listing is counted twice.
+- **Data consistency.** Every stored minimum, median and maximum is checked against its observations; every price record points at a real catalogue id; retailers are approved; no listing is counted twice.
 - **Development-time checks (not part of the repository).** The tests were confirmed to fail when the search was deliberately broken (over-aggressive budget pruning, or UNVERIFIED treated as a pass). The stored prices were cross-checked against copies of the retailer pages saved during research, and all 17 counted observations matched.
 - **Build and static checks.** `npx tsc --noEmit` and `npm run build` pass; lint is clean on the Planner files.
 
