@@ -404,6 +404,8 @@ html:has(.compat-layout) { scroll-padding-bottom: 96px; }
 .plan-input input { flex: 1; min-width: 0; height: 100%; border: 0; outline: 0; background: transparent; font: inherit; color: var(--foreground); }
 .plan-input--invalid { border-color: var(--fault); }
 .plan-error { margin: 6px 0 0; font-size: 12px; line-height: 1.6; color: var(--fault); }
+/* Until a budget is entered the results box is as wide as the budget box; it widens once builds appear. */
+@media (min-width: 961px) { .plan-layout--empty { grid-template-columns: repeat(2, minmax(360px, 440px)); } }
 .plan-section + .plan-section { margin-top: 22px; }
 .plan-heading { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; }
 .plan-count { display: inline-grid; place-items: center; min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px; background: var(--bench); border: 1px solid var(--border); font-size: 12px; font-weight: 600; color: var(--ink-2); }

@@ -86,7 +86,7 @@ export const RAM_KITS: RamKit[] = [
     sources: [{ kind: 'manufacturer', url: 'https://www.corsair.com/us/en/p/memory/cmk16gx4m2b3200c16/vengeancea-lpx-16gb-2-x-8gb-ddr4-dram-3200mhz-c16-memory-kit-black-cmk16gx4m2b3200c16', checked: CHECKED, note: 'Memory Type: DDR4' }],
   },
   {
-    id: 'corsair-cmk32gx5m2b6000c30', brand: 'Corsair', model: 'VENGEANCE® 32GB (2x16GB) DDR5 DRAM Up To 6000MT/s CL30 Memory Kit — Black (CMK32GX5M2B6000C30)', memoryType: 'DDR5',
+    id: 'corsair-cmk32gx5m2b6000c30', brand: 'Corsair', model: 'VENGEANCE® 32GB (2x16GB) DDR5 DRAM Up To 6000MT/s CL30 Memory Kit - Black (CMK32GX5M2B6000C30)', memoryType: 'DDR5',
     sources: [{ kind: 'manufacturer', url: 'https://www.corsair.com/us/en/p/memory/cmk32gx5m2b6000c30/vengeance-32gb-2x16gb-ddr5-dram-6000mt-s-c30-memory-kit-black-cmk32gx5m2b6000c30', checked: CHECKED, note: 'Memory Type: DDR5' }],
   },
   {
