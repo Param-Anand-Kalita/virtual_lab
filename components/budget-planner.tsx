@@ -106,7 +106,7 @@ export default function BudgetPlanner({ onModeChange }: { onModeChange: (mode: M
       <AppHeader mode="planner" onModeChange={onModeChange} />
       <ContextStrip title="Budget planner" />
 
-      <main className={`compat-layout${plan === null ? ' plan-layout--empty' : ''}`}>
+      <main className="compat-layout">
         <section className="compat-panel plan-panel" aria-label="Budget">
           <label className="plan-label" htmlFor="plan-budget">Budget</label>
           <div className={`plan-input${invalid ? ' plan-input--invalid' : ''}`}>
