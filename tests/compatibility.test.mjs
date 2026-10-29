@@ -164,7 +164,8 @@ test('14: every report has three checks, each with an explanation and evidence, 
     const expected = statuses(report).includes('FAILED') ? 'FAILED' : statuses(report).includes('UNVERIFIED') ? 'UNVERIFIED' : 'ALL_CHECKS_PASSED';
     assert.equal(report.overall, expected);
   }
-  assert.equal(combinations, 4 * 7 * 3 * 5);
+  // Every list plus the "nothing selected" option. The RAM list grew from 2 to 4 kits when the budget planner's kits were added.
+  assert.equal(combinations, (CPUS.length + 1) * (MOTHERBOARDS.length + 1) * (RAM_KITS.length + 1) * (CASES.length + 1));
   assert.deepEqual({ CPUS, MOTHERBOARDS, RAM_KITS, CASES }, before);
 });
 
@@ -212,7 +213,8 @@ test('catalogue: Z790 EXTREME (277 mm E-ATX) in the NZXT H5 Flow (2024) is the e
   const check = checkMotherboardCase(z790, h5);
   assert.equal(check.status, 'PASSED');
   assert(text(check).includes('277'));
-  assert(/checked 2026-10-28/.test(text(check)), 'evidence cites the verification date');
+  assert(/\(ASUS source\)/.test(text(check)) && /\(NZXT source\)/.test(text(check)), 'evidence names the manufacturer source of each fact');
+  assert(!/checked \d{4}-\d{2}-\d{2}/.test(text(check)), 'evidence no longer shows a checked date');
   assert.equal(checkMotherboardCase(z790, part.pcCase('fractal-design-define-7')).status, 'PASSED');
 });
 

@@ -11,7 +11,7 @@
     "start": "next start",
     "lint": "oxlint",
     "format": "oxfmt",
-    "test": "node --import ./tests/register.mjs --test tests/lab.test.mjs tests/compatibility.test.mjs tests/assembly.test.mjs",
+    "test": "node --import ./tests/register.mjs --test tests/lab.test.mjs tests/compatibility.test.mjs tests/assembly.test.mjs tests/build-planner.test.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

@@ -57,10 +57,9 @@ function SourceNote({ part }: { part: Product }) {
     return <p className="compat-source"><span className="compat-demo-tag">Demo data</span> {notes.join(' ')}</p>;
   }
   const manufacturer = part.sources.flatMap((source) => (source.kind === 'manufacturer' ? [source] : []));
-  const dates = [...new Set(manufacturer.map((source) => source.checked))].sort();
   return (
     <p className="compat-source">
-      Source: {manufacturer.map((source, index) => <span key={source.url}>{index > 0 && ', '}<a href={source.url} target="_blank" rel="noreferrer">{hostOf(source.url)}</a></span>)} · checked {dates.join(', ')}
+      Source: {manufacturer.map((source, index) => <span key={source.url}>{index > 0 && ', '}<a href={source.url} target="_blank" rel="noreferrer">{hostOf(source.url)}</a></span>)}
     </p>
   );
 }

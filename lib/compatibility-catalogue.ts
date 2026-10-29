@@ -23,6 +23,7 @@ export type RamKit = Base & { memoryType?: MemoryType };
 export type PcCase = Base & { supportedFormFactors?: FormFactor[]; maxBoardWidthMm?: Partial<Record<FormFactor, number>> };
 
 const CHECKED = '2026-10-28';
+const PLANNER_CHECKED = '2026-10-29'; // the two RAM kits added for the budget planner were read a day later
 
 export const CPUS: Cpu[] = [
   {
@@ -87,6 +88,15 @@ export const RAM_KITS: RamKit[] = [
   {
     id: 'corsair-cmk32gx5m2b6000c30', brand: 'Corsair', model: 'VENGEANCE® 32GB (2x16GB) DDR5 DRAM Up To 6000MT/s CL30 Memory Kit — Black (CMK32GX5M2B6000C30)', memoryType: 'DDR5',
     sources: [{ kind: 'manufacturer', url: 'https://www.corsair.com/us/en/p/memory/cmk32gx5m2b6000c30/vengeance-32gb-2x16gb-ddr5-dram-6000mt-s-c30-memory-kit-black-cmk32gx5m2b6000c30', checked: CHECKED, note: 'Memory Type: DDR5' }],
+  },
+  {
+    // Added for the budget planner: stocked and priced by several approved Indian retailers, unlike the 2-kit entries above.
+    id: 'corsair-cmk16gx4m1e3200c16', brand: 'Corsair', model: 'VENGEANCE® LPX 16GB (1 x 16GB) DDR4 DRAM 3200MHz C16 Memory Kit - Black (CMK16GX4M1E3200C16)', memoryType: 'DDR4',
+    sources: [{ kind: 'manufacturer', url: 'https://www.corsair.com/us/en/p/memory/cmk16gx4m1e3200c16/vengeancea-lpx-16gb-1-x-16gb-ddr4-dram-3200mhz-c16-memory-kit-black-cmk16gx4m1e3200c16', checked: PLANNER_CHECKED, note: 'Memory Type: DDR4; 16GB (1 x 16GB) UDIMM; tested speed 3200, tested latency 16. The page lists Intel 300–600 series and AMD 300–500 series platform compatibility; the checker compares memory type only.' }],
+  },
+  {
+    id: 'corsair-cmk16gx5m1e6000z36', brand: 'Corsair', model: 'VENGEANCE® 16GB (1x16GB) DDR5 DRAM 6000MT/s CL36 AMD EXPO & Intel XMP Memory Kit (CMK16GX5M1E6000Z36)', memoryType: 'DDR5',
+    sources: [{ kind: 'manufacturer', url: 'https://www.corsair.com/us/en/p/memory/cmk16gx5m1e6000z36/vengeance-16gb-1x16gb-ddr5-dram-6000mts-cl36-amd-expo-intel-xmp-memory-kit-cmk16gx5m1e6000z36', checked: PLANNER_CHECKED, note: 'Memory Type: DDR5; 16GB (1 x 16GB) UDIMM; tested speed 6000, tested latency 36.' }],
   },
 ];
 

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import HardwareLab from '@/components/hardware-lab';
 import BuildMode from '@/components/build-mode';
 import CompatibilityChecker from '@/components/compatibility-checker';
+import BudgetPlanner from '@/components/budget-planner';
 import type { Mode } from '@/components/app-header';
 
 export default function Home() {
@@ -15,6 +16,10 @@ export default function Home() {
 
   if (mode === 'compatibility') {
     return <CompatibilityChecker onModeChange={setMode} />;
+  }
+
+  if (mode === 'planner') {
+    return <BudgetPlanner onModeChange={setMode} />;
   }
 
   return <HardwareLab onModeChange={setMode} />;

@@ -23,8 +23,7 @@ type Product = { brand: string; model: string; sources: Source[] };
 const nameOf = (product: Product) => (product.model.startsWith(product.brand) ? product.model : `${product.brand} ${product.model}`);
 
 function sourceOf(product: Product): string {
-  const dates = [...new Set(product.sources.flatMap((source) => (source.kind === 'manufacturer' ? [source.checked] : [])))].sort();
-  return dates.length ? `${product.brand} source, checked ${dates.join(', ')}` : 'demo data, not manufacturer-verified';
+  return product.sources.some((source) => source.kind === 'manufacturer') ? `${product.brand} source` : 'demo data, not manufacturer-verified';
 }
 
 const fact = (product: Product, label: string, value: string | number | undefined, unit = '') =>

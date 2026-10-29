@@ -61,6 +61,19 @@ Product specifications live in `lib/compatibility-catalogue.ts`, separate from t
 
 The screen has two panels. The **Parts bench** holds the four selectors, each product's documented specifications as compact chips, its source links and the demo markers. The **Compatibility report** shows the overall result, a rule map (the motherboard at the centre, with each of the three relationships shown by its status in words, an icon and the line style) and the three rule cards. The map repeats what the cards say and is hidden from assistive technology, so the announcement of a result is the one the cards give.
 
+## Budget planner
+
+Choose **Planner** in the header to plan a set of four parts (a CPU, a motherboard, a RAM kit and a case) under a budget in rupees. The budget box starts at ₹60,000 so builds show as soon as the page opens, and it can be changed to any whole-rupee amount. **It plans only those four parts.** It is not a complete PC builder: there is no graphics card, storage, power supply or cooler, and it does not score or rank anything by performance. Builds are ranked by estimated cost, and the cheapest build is not claimed to be the best or fastest one.
+
+- **Search.** `lib/build-planner.ts` runs a depth-first backtracking search: motherboard, then CPU, RAM kit and case. The three existing rules from `lib/compatibility.ts` run unchanged the moment a rule has both of its parts; a pair that FAILS a rule, or that a rule cannot confirm (UNVERIFIED), ends that branch along with everything below it. A second bound drops a branch when its chosen minimum prices plus the cheapest remaining minimum in every unchosen slot already exceed the budget, which can never remove a build whose lowest price fits. The engine takes slots, candidates and rules as data, so a new category and rule can be added without changing the search.
+- **Prices.** `lib/price-catalogue.ts` holds listed prices in rupees, keyed by the ids in the compatibility catalogue. They were read on 29 October 2026. Every counted price is an in-stock listing at one of four retailers: MD Computers, PrimeABGB, Vedant Computers and EliteHubs. Computech Store and PC Studio were also checked but contributed only listings that were not counted (out of stock, or a different variant or model); those are kept with their reasons. Only in-stock listings of the exact model (or the named variant) are counted; everything else seen is kept with the reason it was not counted. Amazon.in and Flipkart marketplace listings are not used. Minimum, maximum and median come from the observations. A part with a single observation is flagged single-source (low confidence) in the planner's data, and its range is that one price; the page shows each part's source count but no separate warning. The prices are a snapshot: they are not updated live and do not include shipping or bank offers.
+- **Budget labels.** A build is **within budget** when its highest total is at or under the budget and **may exceed budget** when only its lowest total is. Builds whose lowest total is over the budget are not shown. Each group is ranked by the sum of the median prices, cheapest first.
+- **Exclusions.** A model without a verified price is left out of the budget results, and the page lists each one with the reason. The two demo entries are never priced. Of the real models, the NZXT H5 Flow (2024) is priced for the white CC-H52FW-01 variant only, and the Fractal Design Define 7 is the Black Solid FD-C-DEF7A-01, which is currently out of stock.
+- **What a result means.** A planned build has passed the three implemented rules only: CPU socket, RAM memory type and motherboard–case fit. That is not a guarantee of complete system compatibility. BIOS and chipset support, memory speed and qualified memory lists, power supply capacity, cooling and any other unimplemented check are out of scope. The catalogue note for the DDR4 kit (CMK16GX4M1E3200C16) records that Corsair's page lists Intel 300–600 series and AMD 300–500 series platforms; the planner does not check platform support, so this is a limitation to confirm for the chosen board, not an incompatibility the rules have found.
+- **Catalogue additions.** The compatibility catalogue gained two Corsair kits that approved retailers stock: the CMK16GX4M1E3200C16 (DDR4) and the CMK16GX5M1E6000Z36 (DDR5). They also appear in the Compatibility page's RAM list.
+
+The backtracking mechanics, search statistics on the real catalogue, verification and technical limitations are written up in [docs/budget-planner-technical-notes.md](docs/budget-planner-technical-notes.md), for reports and presentations. The Planner page itself keeps to plain-language explanations.
+
 ## Responsive layout and touch
 
 - **1200 px and wider:** the component library or parts tray on the left, the flexible 3D view in the middle and the inspector on the right. **900–1199 px** keeps three columns with narrower side panels.
@@ -83,7 +96,7 @@ The screen has two panels. The **Parts bench** holds the four selectors, each pr
 - `components/hardware-lab.tsx`: Explore, the responsive workbench and teaching interactions.
 - `components/build-mode.tsx`: Build mode: the parts tray, pointer dragging from the tray and from the 3D scene, loose parts and the assembly dock.
 - `components/pc-viewport.tsx`: the React wrapper around the Three.js scene.
-- `components/app-header.tsx`: the BuildBench header and Explore / Build / Compatibility navigation shared by every mode, and the context strip under it. `app/page.tsx` owns which mode is shown.
+- `components/app-header.tsx`: the BuildBench header and Explore / Build / Compatibility / Planner navigation shared by every mode, and the context strip under it. `app/page.tsx` owns which mode is shown.
 - `components/viewport-toolbar.tsx`: the camera-view, zoom and labels row above the 3D canvas, shared by Explore and Build.
 - `components/part-inspector.tsx`: the selected-part inspector shared by Explore and Build (identity and state, role, analogy, connections, specifications, the fact to remember, pinned actions).
 - `components/install-guidance.tsx`: Build mode's installation guidance (mount site, prerequisites, location, next action), derived only from `lib/assembly.ts` and the build state.
@@ -93,6 +106,10 @@ The screen has two panels. The **Parts bench** holds the four selectors, each pr
 - `lib/compatibility-catalogue.ts`: sourced CPU, motherboard, RAM and case data for the compatibility checker.
 - `lib/compatibility.ts`: the three pure rule functions and the overall report logic; no React or Three.js.
 - `components/compatibility-checker.tsx`: the checker screen.
+- `lib/price-catalogue.ts`: observed in-stock prices, sources and exclusion reasons for the budget planner (data only).
+- `lib/build-planner.ts`: price statistics, the generic backtracking search and the budget planner over the existing catalogue and rules; no React or Three.js.
+- `components/budget-planner.tsx`: the Planner screen.
+- `docs/budget-planner-technical-notes.md`: how the Planner search works, its pruning statistics on the real catalogue, how it was verified and its limitations.
 
 Rendering requires WebGL 2 and hardware acceleration. An accessible explanation list remains available when WebGL cannot initialize. Reduced-motion preferences disable automatic rotation and smooth movement. The renderer pauses drawing when the scene is unchanged and caps its pixel ratio for classroom devices.
 
@@ -107,7 +124,7 @@ npm run build
 
 Tests cover guided and arbitrary assembly sequences, the Build order and prerequisite locks, what a drop means (only a ready part released over its own target installs; elsewhere it stays loose), mount-zone and drag-placement geometry, geometry integrity/picking tags, optional agent-tool input contracts, and the compatibility checker (each rule's passed, failed and unverified outcomes, missing data, width limits, overall status, catalogue integrity and the documented demonstration combinations).
 
-`npm run lint` currently exits with errors: 31 errors and 1 warning across 17 files. None are in the compatibility checker or in the code added for the Build workflow's rules. They are accessibility-style, template-expression and unused-import findings in the inherited interface code (`components/hardware-lab.tsx`, `components/build-mode.tsx`, `components/pc-viewport.tsx`) and its `components/ui/` kit, plus three in `components/viewport-toolbar.tsx`, where the camera-control markup that Explore and Build each used to carry was consolidated.
+`npm run lint` currently exits with errors: 29 errors and 1 warning across 17 files (counted on 29 October 2026; the figure drifts as files change). None are in the compatibility checker, the budget planner or the code added for the Build workflow's rules. They are accessibility-style, template-expression and unused-import findings in the inherited interface code (`components/hardware-lab.tsx`, `components/build-mode.tsx`, `components/pc-viewport.tsx`) and its `components/ui/` kit, plus three in `components/viewport-toolbar.tsx`, where the camera-control markup that Explore and Build each used to carry was consolidated.
 
 Production build and route response are checked separately. Headless Chrome scripts that are not included in the repository exercised navigation between the three modes, the main Explore interactions, Build dragging (valid and invalid drops, loose-part recovery, Escape and Reset), the compatibility checker against every combination in the catalogue, and layouts from 320 to 1920 px; automated UI tests are not part of the repository. A supported browser WebMCP context was unavailable for live registry validation; optional tool contracts were checked in Node.
 

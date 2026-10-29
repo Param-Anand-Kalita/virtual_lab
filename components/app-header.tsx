@@ -1,14 +1,15 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { Box, Compass, Hammer, ListChecks } from 'lucide-react';
+import { Box, Compass, Hammer, ListChecks, Wallet } from 'lucide-react';
 
-export type Mode = 'explore' | 'build' | 'compatibility';
+export type Mode = 'explore' | 'build' | 'compatibility' | 'planner';
 
 const MODES: { mode: Mode; label: string; Icon: typeof Box }[] = [
   { mode: 'explore', label: 'Explore', Icon: Compass },
   { mode: 'build', label: 'Build', Icon: Hammer },
   { mode: 'compatibility', label: 'Compatibility', Icon: ListChecks },
+  { mode: 'planner', label: 'Planner', Icon: Wallet },
 ];
 
 /** The header every mode shares. `mode` is owned by app/page.tsx: this only asks for a change and never holds state. */
