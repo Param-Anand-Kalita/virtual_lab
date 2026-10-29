@@ -26,6 +26,7 @@ import {
 import { COMPONENTS, PART_IDS, type PartId } from '@/lib/components-data';
 import { BUILD_ORDER, MOUNT_SITES, canInstall, missingRequirements, nextBuildStep, partLocation, releaseUnavailableLoose, resolveDrop, trayParts, uninstallWithDependents, withoutLoose, type DropPoint, type LoosePlacements } from '@/lib/assembly';
 import PCViewport, { type ViewportHandle } from './pc-viewport';
+import { recall, useRemember } from '@/lib/remembered-state';
 import { AppHeader, ContextStrip, type Mode } from './app-header';
 import ViewportToolbar from './viewport-toolbar';
 import PanelTabs, { type Panel } from './panel-tabs';
@@ -58,11 +59,11 @@ type DragSession = { id: PartId; pointerId: number; startX: number; startY: numb
 type DragZone = 'outside' | 'viewport' | 'target';
 
 export default function BuildMode({ onModeChange }: { onModeChange: (mode: Mode) => void }) {
-  const [installed, setInstalled] = useState<PartId[]>([]);
+  const [installed, setInstalled] = useState<PartId[]>(() => recall('build-installed', []));
   // Parts released away from their mount stay in the workspace, uninstalled, until they are installed or reset.
-  const [loose, setLoose] = useState<LoosePlacements>({});
+  const [loose, setLoose] = useState<LoosePlacements>(() => recall('build-loose', {}));
   // Selection (which part is active) and dragging (a part is in flight) are separate states.
-  const [selected, setSelected] = useState<PartId | null>(null);
+  const [selected, setSelected] = useState<PartId | null>(() => recall('build-selected', null));
   const [autoRotate, setAutoRotate] = useState(false);
   const [labels, setLabels] = useState(false);
   const [view, setView] = useState('perspective');
@@ -73,7 +74,11 @@ export default function BuildMode({ onModeChange }: { onModeChange: (mode: Mode)
   // True while the drag is a loose part carried in the 3D scene rather than a card carried from the tray.
   const [sceneDrag, setSceneDrag] = useState(false);
   const [focusMode, setFocusMode] = useState(false);
-  const [completed, setCompleted] = useState(false);
+  const [completed, setCompleted] = useState(() => recall('build-completed', false));
+  useRemember('build-installed', installed);
+  useRemember('build-loose', loose);
+  useRemember('build-selected', selected);
+  useRemember('build-completed', completed);
   const viewport = useRef<ViewportHandle>(null);
   const dragSession = useRef<DragSession | null>(null);
   const dragChip = useRef<HTMLDivElement>(null);
@@ -216,7 +221,6 @@ export default function BuildMode({ onModeChange }: { onModeChange: (mode: Mode)
       const left = scene?.endDrag('loose');
       if (left) setLoose((prev) => ({ ...prev, [id]: left }));
       setSelected(id);
-      setToast(`Not installed. The ${nameOf(id).toLowerCase()} stays in the workspace. Drag it onto the highlighted ${MOUNT_SITES[id]}.`);
     } else {
       scene?.endDrag('cancel');
       if (outcome.kind === 'locked') setToast(`Install ${outcome.missing.map(nameOf).join(', ')} first.`);

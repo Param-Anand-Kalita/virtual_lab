@@ -1,8 +1,9 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { Info } from 'lucide-react';
+import { useMemo } from 'react';
+import { Info, X } from 'lucide-react';
 import { planBuilds, retailerCoverage, SLOT_LABEL, SLOT_ORDER, type ExcludedModel, type PartSlot, type PlannedBuild, type PricedPart } from '@/lib/build-planner';
+import { useRememberedState } from '@/lib/remembered-state';
 import { AppHeader, ContextStrip, type Mode } from './app-header';
 
 const MAX_BUDGET = 10_000_000;
@@ -92,7 +93,7 @@ function ExcludedList({ excluded }: { excluded: ExcludedModel[] }) {
 }
 
 export default function BudgetPlanner({ onModeChange }: { onModeChange: (mode: Mode) => void }) {
-  const [text, setText] = useState('');
+  const [text, setText] = useRememberedState('planner-budget', '');
   const budget = parseBudget(text);
   const blank = text.trim() === '';
   const invalid = budget === null && !blank; // an empty box is just waiting for input, not an error
@@ -112,6 +113,7 @@ export default function BudgetPlanner({ onModeChange }: { onModeChange: (mode: M
           <div className={`plan-input${invalid ? ' plan-input--invalid' : ''}`}>
             <span aria-hidden="true">₹</span>
             <input id="plan-budget" inputMode="numeric" autoComplete="off" placeholder="Enter your budget here" value={text} onChange={(event) => setText(event.target.value)} aria-invalid={invalid} aria-describedby={invalid ? 'plan-budget-error' : undefined} />
+            {text !== '' && <button type="button" className="icon-button" onClick={() => setText('')} aria-label="Clear budget" title="Clear"><X size={16} aria-hidden="true" /></button>}
           </div>
           {invalid && <p id="plan-budget-error" className="plan-error" role="alert">Enter a whole number of rupees between 1 and {MAX_BUDGET.toLocaleString('en-IN')}, for example 60000.</p>}
 

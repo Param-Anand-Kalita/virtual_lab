@@ -207,7 +207,7 @@ h1 { font-size: 20px; letter-spacing: -.4px; line-height: 1.2; font-weight: 600;
 .req-met svg, .req-met em { color: var(--ok); }
 .req-missing svg, .req-missing em { color: var(--ink-2); }
 .install-guide .req-none { margin: 0; font-size: 13px; color: var(--muted-foreground); }
-.lab-toast { position: absolute; width: max-content; top: 12px; left: 50%; transform: translateX(-50%); z-index: 5; pointer-events: none; display: flex; align-items: center; gap: 8px; padding: 12px 17px; max-width: min(520px, calc(100% - 32px)); border-radius: 7px; background: var(--foreground); color: white; font-size: 13px; }
+.lab-toast { position: absolute; width: max-content; top: 4px; left: 50%; transform: translateX(-50%); z-index: 5; pointer-events: none; display: flex; align-items: center; gap: 8px; padding: 12px 17px; max-width: min(520px, calc(100% - 32px)); border-radius: 7px; background: var(--foreground); color: white; font-size: 13px; }
 .part-dragging .lab-toast { visibility: hidden; }
 .lab-toast svg { flex-shrink: 0; color: var(--ok-soft); }
 .focus-mode .component-sidebar, .focus-mode .inspector { display: none; }

@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
 import { Box, CircleCheck, CircleHelp, CircleX, CircuitBoard, Cpu, Info, MemoryStick, Play, RotateCcw } from 'lucide-react';
 import { NativeSelect, NativeSelectOption } from '@/components/ui/native-select';
 import { CASES, CPUS, MOTHERBOARDS, RAM_KITS, type Cpu as CpuPart, type Motherboard, type PcCase, type RamKit, type Source } from '@/lib/compatibility-catalogue';
 import { checkCompatibility, type CheckResult, type CheckStatus, type CompatibilityReport, type OverallStatus, type RuleId } from '@/lib/compatibility';
+import { useRememberedState } from '@/lib/remembered-state';
 import { AppHeader, ContextStrip, type Mode } from './app-header';
 
 type PartKind = 'cpu' | 'motherboard' | 'ram' | 'pcCase';
@@ -160,9 +160,9 @@ function CheckCard({ check }: { check: CheckResult }) {
 }
 
 export default function CompatibilityChecker({ onModeChange }: { onModeChange: (mode: Mode) => void }) {
-  const [choice, setChoice] = useState<Choice>(EMPTY);
-  const [report, setReport] = useState<CompatibilityReport | null>(null);
-  const [stale, setStale] = useState(false); // true when a selection changed after a result was shown
+  const [choice, setChoice] = useRememberedState<Choice>('compat-choice', EMPTY);
+  const [report, setReport] = useRememberedState<CompatibilityReport | null>('compat-report', null);
+  const [stale, setStale] = useRememberedState('compat-stale', false); // true when a selection changed after a result was shown
   const hasChoice = Object.values(choice).some(Boolean);
 
   const change = (kind: PartKind, id: string) => {
